@@ -15,6 +15,7 @@ void setup() {
   Wire.onRequest(requestEvent); // calls requestEvent whenever data is requested
   Wire.onReceive(receiveEvent); // calls receiveEvent whenever it receives data
   pinMode(led_pin, OUTPUT);
+  mem_map = 0;
 }
 
 void loop() {
@@ -32,7 +33,8 @@ void requestEvent() {
     else
       Wire.write(0);
   }
-  else if (last_command == 3) //analogRead
+  
+  if (last_command == 3) //analogRead
   {
     int value = analogRead(read_addr);  //read from the pin
     //must send [high byte][low byte], so the value must be split up into two:
@@ -43,11 +45,10 @@ void requestEvent() {
     Wire.write(high);
     Wire.write(low);
   }
-  else if (last_command == 4) // digitalRead
+  
+  if (last_command == 4) // digitalRead
   {
-    pinMode(read_addr, INPUT);
-    byte value = digitalRead(read_addr);
-    Wire.write(value);
+    Wire.write(digitalRead(read_addr));
   }
 }
 
@@ -68,7 +69,7 @@ void receiveEvent(int numBytes) //we know how many bytes we received, whenever w
 
   else if (last_command == 2) // write command
   {
-    byte mem_map = data[3]; // this data can then be saved in a memory_map using write_addr
+    mem_map = data[2]; // this data can then be saved in a memory_map using write_addr
     write_addr = data[1]; // not used in this implementation
   }
   else if (last_command == 3) //analogRead

@@ -23,14 +23,12 @@ void setup() {
   Wire.begin(); // no address, since this is a master
   Serial.begin(9600); // start serial for output
   incrementer = 0;
-  pinMode(12, OUTPUT);
-  digitalWrite(12, HIGH);
 }
 
 void loop() {
 
   Serial.println(readByteSlave(SLAVE_ADDR, 1));   //reads a byte at memory_address 1
-  
+
   writeByteSlave(SLAVE_ADDR, 1, incrementer);
   incrementer++;
 
@@ -73,10 +71,9 @@ int analogReadSlave(byte address, byte pin)
   return final_value;
 }
 
-bool digitalReadSlave(byte address, byte pin)
+byte digitalReadSlave(byte address, byte pin)
 {
   Wire.beginTransmission(address);
-  Wire.write(address);
   Wire.write(4); // digitalRead command
   Wire.write(pin);
   Wire.endTransmission();
@@ -85,9 +82,9 @@ bool digitalReadSlave(byte address, byte pin)
   Wire.requestFrom(address, 1);
 
   byte data;
-  while(Wire.available())
+  while (Wire.available())
     data = Wire.read();
-
+    
   return data;
 }
 
@@ -112,9 +109,7 @@ byte readByteSlave(byte address, byte read_addr)
 
   byte data;
   while (Wire.available())
-  {
     data = Wire.read(); //get the answer back
-  }
 
   return data;
 }
@@ -123,6 +118,7 @@ void writeByteSlave(byte address, byte write_addr, byte data)
 {
   Wire.beginTransmission(address);
   Wire.write(2);  //write command
-  Wire.write(write_addr); 
+  Wire.write(write_addr);
   Wire.write(data);
+  Wire.endTransmission();
 }
